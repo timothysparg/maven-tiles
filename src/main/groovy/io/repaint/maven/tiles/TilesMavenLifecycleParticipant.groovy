@@ -443,7 +443,9 @@ public class TilesMavenLifecycleParticipant extends AbstractMavenLifecyclePartic
 				throw new MavenExecutionException("Cannot apply tiles, the expected parent ${applyBeforeParent} is not found.",
 					project.file)
 			}
-			copyModel(project, finalModel.effectiveModel)
+			//FIXME hack to illustrate resolution of profile issue
+//			copyModel(project, finalModel.effectiveModel)
+			copyModel(project, finalModel.effectiveModel,tiles)
 		} finally {
 			// restore original ModelProcessor
 			((DefaultModelBuilder)modelBuilder).setModelProcessor(modelProcessor)
@@ -588,7 +590,10 @@ public class TilesMavenLifecycleParticipant extends AbstractMavenLifecyclePartic
 
 	}
 
-	protected void copyModel(MavenProject project, Model newModel) {
+	//FIXME hack to illustrate resolution of profile issue
+	//protected void copyModel(MavenProject project, Model newModel) {
+	protected void copyModel(MavenProject project, Model newModel, List<TileModel> tiles ) {
+
 
 		// no setting parent, we have generated an effective model which is now all copied in
 		Model projectModel = project.model
@@ -632,6 +637,12 @@ public class TilesMavenLifecycleParticipant extends AbstractMavenLifecyclePartic
 				build.pluginManagement = new PluginManagement()
 			}
 			build.pluginManagement.addPlugin(m2ePlugin)
+		}
+
+		//FIXME hack to illustrate resolution of profile issue
+		tiles.each { TileModel tileModel ->
+			Model model = tileModel.model
+			projectModel.profiles.addAll(model.profiles)
 		}
 	}
 
